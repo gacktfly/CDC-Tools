@@ -7,7 +7,8 @@ namespace CdcTools.CdcReader.Tables
 {
     internal class TableSchemaQueryBuilder
     {
-        public const string GetColumnsQuery = @"SELECT TABLE_SCHEMA	
+        public const string GetColumnsQuery = @"SELECT TABLE_CATALOG
+    ,TABLE_SCHEMA	
 	,TABLE_NAME
 	,COLUMN_NAME
 	,ORDINAL_POSITION
@@ -18,10 +19,12 @@ namespace CdcTools.CdcReader.Tables
     ,NUMERIC_PRECISION
 FROM INFORMATION_SCHEMA.COLUMNS";
 
-        public static string GetColumnsOfTableQuery()
+        public static string GetColumnsOfTableQuery(string catalog)
         {
-            return GetColumnsQuery 
-                + Environment.NewLine + "WHERE TABLE_NAME = @TableName";
+            return "USE " + catalog + ";"
+                   + Environment.NewLine +
+                   GetColumnsQuery
+                   + Environment.NewLine + "WHERE TABLE_NAME = @TableName";
         }
 
         public const string GetPrimaryKeysQuery = @"SELECT OBJECT_NAME(IC.OBJECT_ID) As TableName

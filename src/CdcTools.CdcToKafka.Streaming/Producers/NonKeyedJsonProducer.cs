@@ -36,6 +36,9 @@ namespace CdcTools.CdcToKafka.Streaming.Producers
             var sent = false;
             while (!sent && !token.IsCancellationRequested)
             {
+                Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId.ToString()}  topic: {_topic} \r\n jsonText: {jsonText}");
+                sent = true;
+                continue;
                 var sendResult = await _producer.ProduceAsync(topic: _topic, key: null, val: jsonText, blockIfQueueFull: true);
                 if (sendResult.Error.HasError)
                 {

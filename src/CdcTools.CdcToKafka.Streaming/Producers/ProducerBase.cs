@@ -23,7 +23,10 @@ namespace CdcTools.CdcToKafka.Streaming.Producers
                 Data = changeRecord.Data,
                 ChangeKey = changeRecord.ChangeKey,
                 Lsn = changeRecord.LsnStr,
-                SeqVal = changeRecord.SeqValStr
+                SeqVal = changeRecord.SeqValStr,
+                Database = changeRecord.Database,
+                Table =  changeRecord.TableName,
+                Schema = changeRecord.schema
             };
         }
     }

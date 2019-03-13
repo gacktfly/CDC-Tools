@@ -48,8 +48,32 @@ namespace CdcTools.CdcToKafka.Streaming
             var schemaRegistryUrl = GetSchemaRegistryUrl(configuration);
             var cdcReaderClient = new CdcReaderClient(configuration["DatabaseConnection"], configuration["StateManagmentConnection"]);
             var cts = new CancellationTokenSource();
+            var tableWithDatabases = new List<TableWithDatabase>();
 
-            if(runMode == RunMode.FullLoad)
+            //不单独配置表名的话，直接读取当前实例下全部用户库下所有用户表
+            if (tables == null || tables.Count == 0)
+            {
+                string databaseRegex = configuration["DatabaseWhiteRegex"];
+                string tableRegex = configuration["TableWhiteRegex"];
+                var fullPathTableInfo = cdcReaderClient.GetCdcTables(databaseRegex, tableRegex).Result;
+                fullPathTableInfo.ForEach(t =>
+                {
+                    var _t = t.Split('.');
+                    tableWithDatabases.Add(new TableWithDatabase
+                    {
+                        Catalog = _t[0],
+                        Schema = _t[1],
+                        Table = _t[2]
+                    });
+                    tables.Add(_t[0]);
+                });
+            }
+            else
+            {
+                //TODO:appsettins.json配置的tables，需补全tableWithDatabases
+            }
+
+            if (runMode == RunMode.FullLoad)
             {
                 var printMod = GetPrintMod(configuration);
                 var fullLoadStreamer = new FullLoadStreamer(configuration, cdcReaderClient);
@@ -99,7 +123,8 @@ namespace CdcTools.CdcToKafka.Streaming
                     Interval = interval,
                     SendWithKey = sendWithKey,
                     SerializationMode = serializationMode,
-                    Tables = tables
+                    Tables = tables,
+                    TableWithDatabases = tableWithDatabases
                 };
                 var cdcStreamer = new ChangeStreamer(configuration, cdcReaderClient);
                 cdcStreamer.StartReading(cts.Token, cdcRequest);

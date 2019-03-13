@@ -7,6 +7,8 @@ namespace CdcTools.CdcReader.Tables
 {
     public interface ITableSchemaRepository
     {
-        Task<TableSchema> GetTableSchemaAsync(string tableName);
+        Task<TableSchema> GetTableSchemaAsync(string catalog, string tableName);
+
+        Task<List<string>> GetCdcTables(string databaseRegex, string tableRegex);
     }
 }

@@ -8,7 +8,7 @@ namespace CdcTools.CdcReader.Tables
 {
     public interface ICdcRepository
     {
-        Task<byte[]> GetMinValidLsnAsync(string tableName);
+        Task<byte[]> GetMinValidLsnAsync(TableSchema table);
         Task<byte[]> GetMaxLsnAsync();
         Task<ChangeBatch> GetChangeBatchAsync(TableSchema tableSchema, byte[] fromLsn, byte[] fromSeqVal, byte[] toLsn, int batchSize);
         Task<ChangeBatch> GetChangeBatchAsync(TableSchema tableSchema, byte[] fromLsn, byte[] toLsn, int batchSize);

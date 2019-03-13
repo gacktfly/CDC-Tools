@@ -6,6 +6,7 @@ namespace CdcTools.CdcReader.Tables
 {
     internal class TableColumn
     {
+        public string Database { get; set; }
         public string Schema { get; set; }
         public string TableName { get; set; }
         public int OrdinalPosition { get; set; }

@@ -45,7 +45,7 @@ namespace CdcTools.CdcReader.Transactional.State
             using (var conn = await GetConnectionAsync())
             {
                 var command = conn.CreateCommand();
-                command.CommandText = @"INSERT INTO [CdcTools].[TransactionState]([ExecutionId],[Lsn],[LastUpdate])
+                command.CommandText = @"INSERT INTO [CdcTools].[dbo].[TransactionState]([ExecutionId],[Lsn],[LastUpdate])
 VALUES(@ExecutionId,@Lsn,GETUTCDATE())";
                 command.Parameters.Add("ExecutionId", SqlDbType.VarChar, 50).Value = executionId;
                 command.Parameters.Add("Lsn", SqlDbType.Binary, 10).Value = transactionId.Lsn;
@@ -58,7 +58,7 @@ VALUES(@ExecutionId,@Lsn,GETUTCDATE())";
             using (var conn = await GetConnectionAsync())
             {
                 var command = conn.CreateCommand();
-                command.CommandText = @"UPDATE [CdcTools].[TransactionState]
+                command.CommandText = @"UPDATE [CdcTools].[dbo].[TransactionState]
 SET [Lsn] = @Lsn,
     [LastUpdate] = GETUTCDATE()
 WHERE ExecutionId = @ExecutionId";
@@ -73,7 +73,7 @@ WHERE ExecutionId = @ExecutionId";
             using (var conn = await GetConnectionAsync())
             {
                 var command = conn.CreateCommand();
-                command.CommandText = "SELECT TOP 1 Lsn FROM [CdcTools].[TransactionState] WHERE ExecutionId = @ExecutionId";
+                command.CommandText = "SELECT TOP 1 Lsn FROM [CdcTools].[dbo].[TransactionState] WHERE ExecutionId = @ExecutionId";
                 command.Parameters.Add("ExecutionId", SqlDbType.VarChar, 50).Value = executionId;
                 
                 using (var reader = await command.ExecuteReaderAsync())

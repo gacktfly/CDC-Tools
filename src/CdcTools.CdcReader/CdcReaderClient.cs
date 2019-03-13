@@ -16,10 +16,10 @@ namespace CdcTools.CdcReader
 
         public CdcReaderClient(string connectionString,
             string stateManagementConnectionString,
-            ICdcRepository cdcRepository=null,
-            ITableSchemaRepository tableSchemaRepository=null,
-            IFullLoadRepository fullLoadRepository=null,
-            IStateManager stateManager=null)
+            ICdcRepository cdcRepository = null,
+            ITableSchemaRepository tableSchemaRepository = null,
+            IFullLoadRepository fullLoadRepository = null,
+            IStateManager stateManager = null)
         {
             if (cdcRepository == null)
                 _cdcRepository = new CdcRepository(connectionString);
@@ -42,9 +42,9 @@ namespace CdcTools.CdcReader
                 _stateManager = stateManager;
         }
 
-        public async Task<byte[]> GetMinValidLsnAsync(string tableName)
+        public async Task<byte[]> GetMinValidLsnAsync(TableSchema table)
         {
-            return await _cdcRepository.GetMinValidLsnAsync(tableName);
+            return await _cdcRepository.GetMinValidLsnAsync(table);
         }
 
         public async Task<byte[]> GetMaxLsnAsync()
@@ -62,9 +62,14 @@ namespace CdcTools.CdcReader
             return await _cdcRepository.GetChangeBatchAsync(tableSchema, fromLsn, toLsn, batchSize);
         }
 
-        public async Task<TableSchema> GetTableSchemaAsync(string tableName)
+        public async Task<TableSchema> GetTableSchemaAsync(string catalog, string tableName)
         {
-            return await _tableSchemaRepository.GetTableSchemaAsync(tableName);
+            return await _tableSchemaRepository.GetTableSchemaAsync(catalog, tableName);
+        }
+
+        public async Task<List<string>> GetCdcTables(string databaseRegex, string tableRegex)
+        {
+            return await _tableSchemaRepository.GetCdcTables(databaseRegex, tableRegex);
         }
 
         public async Task<FullLoadBatch> GetFirstBatchAsync(TableSchema tableSchema, int batchSize)

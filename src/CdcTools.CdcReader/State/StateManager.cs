@@ -51,7 +51,7 @@ namespace CdcTools.CdcReader.State
             using (var conn = await GetConnectionAsync())
             {
                 var command = conn.CreateCommand();
-                command.CommandText = @"INSERT INTO [CdcTools].[ChangeState]([ExecutionId],[TableName],[Lsn],[SeqVal],[LastUpdate])
+                command.CommandText = @"INSERT INTO [CdcTools].[dbo].[ChangeState]([ExecutionId],[TableName],[Lsn],[SeqVal],[LastUpdate])
 VALUES(@ExecutionId,@TableName,@Lsn,@SeqVal,GETUTCDATE())";
                 command.Parameters.Add("ExecutionId", SqlDbType.VarChar, 50).Value = executionId;
                 command.Parameters.Add("TableName", SqlDbType.VarChar, 200).Value = tableName;
@@ -66,7 +66,7 @@ VALUES(@ExecutionId,@TableName,@Lsn,@SeqVal,GETUTCDATE())";
             using (var conn = await GetConnectionAsync())
             {
                 var command = conn.CreateCommand();
-                command.CommandText = @"UPDATE [CdcTools].[ChangeState]
+                command.CommandText = @"UPDATE [CdcTools].[dbo].[ChangeState]
 SET [Lsn] = @Lsn,
     [SeqVal] = @SeqVal,
     [LastUpdate] = GETUTCDATE()
@@ -85,7 +85,7 @@ AND TableName = @TableName";
             using (var conn = await GetConnectionAsync())
             {
                 var command = conn.CreateCommand();
-                command.CommandText = "SELECT TOP 1 Lsn, SeqVal FROM [CdcTools].[ChangeState] WHERE ExecutionId = @ExecutionId AND TableName = @TableName";
+                command.CommandText = "SELECT TOP 1 Lsn, SeqVal FROM [CdcTools].[dbo].[ChangeState] WHERE ExecutionId = @ExecutionId AND TableName = @TableName";
                 command.Parameters.Add("ExecutionId", SqlDbType.VarChar, 50).Value = executionId;
                 command.Parameters.Add("TableName", SqlDbType.VarChar, 200).Value = tableName;
 
@@ -116,7 +116,7 @@ AND TableName = @TableName";
             using (var conn = await GetConnectionAsync())
             {
                 var command = conn.CreateCommand();
-                command.CommandText = "SELECT TOP 1 PrimaryKeyValue FROM [CdcTools].[FullLoadState] WHERE ExecutionId = @ExecutionId AND TableName = @TableName";
+                command.CommandText = "SELECT TOP 1 PrimaryKeyValue FROM [CdcTools].[dbo].[FullLoadState] WHERE ExecutionId = @ExecutionId AND TableName = @TableName";
                 command.Parameters.Add("ExecutionId", SqlDbType.VarChar, 50).Value = executionId;
                 command.Parameters.Add("TableName", SqlDbType.VarChar, 200).Value = tableName;
 
@@ -162,7 +162,7 @@ AND TableName = @TableName";
             using (var conn = await GetConnectionAsync())
             {
                 var command = conn.CreateCommand();
-                command.CommandText = @"INSERT INTO [CdcTools].[FullLoadState]([ExecutionId],[TableName],[PrimaryKeyValue],[LastUpdate])
+                command.CommandText = @"INSERT INTO [CdcTools].[dbo].[FullLoadState]([ExecutionId],[TableName],[PrimaryKeyValue],[LastUpdate])
 VALUES(@ExecutionId,@TableName,@PrimaryKeyValue,GETUTCDATE())";
                 command.Parameters.Add("ExecutionId", SqlDbType.VarChar, 50).Value = executionId;
                 command.Parameters.Add("TableName", SqlDbType.VarChar, 200).Value = tableName;
@@ -176,7 +176,7 @@ VALUES(@ExecutionId,@TableName,@PrimaryKeyValue,GETUTCDATE())";
             using (var conn = await GetConnectionAsync())
             {
                 var command = conn.CreateCommand();
-                command.CommandText = @"UPDATE [CdcTools].[FullLoadState]
+                command.CommandText = @"UPDATE [CdcTools].[dbo].[FullLoadState]
 SET [PrimaryKeyValue] = @PrimaryKeyValue,
     [LastUpdate] = GETUTCDATE()
 WHERE ExecutionId = @ExecutionId

@@ -20,18 +20,19 @@ namespace CdcTools.CdcReader.Tables
             _connString = connectionString;
         }
 
-        public async Task<byte[]> GetMinValidLsnAsync(string tableName)
+        public async Task<byte[]> GetMinValidLsnAsync(TableSchema table)
         {
             using (var conn = await GetConnectionAsync())
             {
                 var command = conn.CreateCommand();
                 command.CommandText = string.Format(@"
+USE {0};
 DECLARE @from_lsn binary (10)
-SET @from_lsn = sys.fn_cdc_get_min_lsn('{0}')
+SET @from_lsn = sys.fn_cdc_get_min_lsn('{1}')
 IF @from_lsn = 0x00000000000000000000
-	SET @from_lsn = (SELECT TOP 1 __$start_lsn FROM [cdc].[dbo_{0}_CT] ORDER BY __$start_lsn)
+	SET @from_lsn = (SELECT TOP 1 __$start_lsn FROM [cdc].[cdc_{1}_CT] ORDER BY __$start_lsn)
 
-SELECT @from_lsn", tableName);
+SELECT @from_lsn", table.Database, table.TableName);
 
 
                 var result = await command.ExecuteScalarAsync();
@@ -71,10 +72,12 @@ SELECT @from_lsn", tableName);
                 command.Parameters.Add("@from_seqval", SqlDbType.Binary, 10).Value = fromSeqVal;
                 command.Parameters.Add("@to_lsn", SqlDbType.Binary, 10).Value = toLsn;
 
-                command.CommandText = string.Format(@"SELECT TOP {0} *
-FROM [cdc].[fn_cdc_get_all_changes_dbo_{1}](@from_lsn, @to_lsn, 'all')
+                command.CommandText = string.Format(@"
+USE {0};
+SELECT TOP {1} *
+FROM [cdc].[fn_cdc_get_all_changes_cdc_{2}](@from_lsn, @to_lsn, 'all')
 WHERE __$seqval >= @from_seqval
-ORDER BY __$seqval", batchSize + 1, tableSchema.TableName);
+ORDER BY __$seqval", tableSchema.Database, batchSize + 1, tableSchema.TableName);
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -87,6 +90,7 @@ ORDER BY __$seqval", batchSize + 1, tableSchema.TableName);
                             var changeRecord = new ChangeRecord();
                             changeRecord.ChangeType = (ChangeType)(int)reader["__$operation"];
                             changeRecord.TableName = tableSchema.TableName;
+                            changeRecord.Database = tableSchema.Database;
 
                             changeRecord.Lsn = (byte[])reader["__$start_lsn"];
                             var lsn = new BigInteger(changeRecord.Lsn.Reverse().ToArray());
@@ -152,9 +156,11 @@ ORDER BY __$seqval", batchSize + 1, tableSchema.TableName);
                 command.Parameters.Add("@from_lsn", SqlDbType.Binary, 10).Value = fromLsn;
                 command.Parameters.Add("@to_lsn", SqlDbType.Binary, 10).Value = toLsn;
 
-                command.CommandText = string.Format(@"SELECT TOP {0} *
-FROM [cdc].[fn_cdc_get_all_changes_dbo_{1}](@from_lsn, @to_lsn, 'all')
-ORDER BY __$seqval", batchSize + 1, tableSchema.TableName);
+                command.CommandText = string.Format(@"
+USE {0};
+SELECT TOP {1} *
+FROM [cdc].[fn_cdc_get_all_changes_cdc_{2}](@from_lsn, @to_lsn, 'all')
+ORDER BY __$seqval", tableSchema.Database, batchSize + 1, tableSchema.TableName);
 
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -167,6 +173,7 @@ ORDER BY __$seqval", batchSize + 1, tableSchema.TableName);
                             var changeRecord = new ChangeRecord();
                             changeRecord.ChangeType = (ChangeType)(int)reader["__$operation"];
                             changeRecord.TableName = tableSchema.TableName;
+                            changeRecord.Database = tableSchema.Database;
 
                             changeRecord.Lsn = (byte[])reader["__$start_lsn"];
                             var lsn = new BigInteger(changeRecord.Lsn.Reverse().ToArray());

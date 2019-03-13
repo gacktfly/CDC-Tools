@@ -7,6 +7,7 @@ namespace CdcTools.CdcReader.Tables
 {
     public class TableSchema
     {
+        public String Database { get; set; }
         public string Schema { get; set; }
         public string TableName { get; set; }
         public IList<ColumnSchema> Columns { get; set; }

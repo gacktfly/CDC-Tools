@@ -40,7 +40,8 @@ namespace CdcTools.CdcToKafka.Streaming
         {
             foreach (var tableName in tables)
             {
-                var tableSchema = await _cdcReaderClient.GetTableSchemaAsync(tableName);
+                //TODO:catalog;
+                var tableSchema = await _cdcReaderClient.GetTableSchemaAsync("",tableName);
                 _loadTasks.Add(Task.Run(async () =>
                 {
                     try

@@ -17,5 +17,8 @@ namespace CdcTools.CdcToKafka.Streaming
         public string ChangeKey { get; set; }
         public ChangeType ChangeType { get; set; }
         public Dictionary<string, object> Data { get; set; }
+        public string Database { get; set; }
+        public string Schema { get; set; }
+        public string Table { get; set; }
     }
 }

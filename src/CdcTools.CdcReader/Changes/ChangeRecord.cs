@@ -12,6 +12,8 @@ namespace CdcTools.CdcReader.Changes
             Data = new Dictionary<string, object>();
         }
 
+        public string Database { get; set; }
+        public string schema { get; set; }
         public string TableName { get; set; }
         public byte[] Lsn { get; set; }
         public string LsnStr { get; set; }
